@@ -26,8 +26,6 @@ public class User extends BaseTimeEntity {
     @Column(nullable = false)
     private Role role;
 
-    private Long coin;
-
     private Long footprints;
 
     @Builder
@@ -35,7 +33,6 @@ public class User extends BaseTimeEntity {
         this.name = name;
         this.email = email;
         this.role = role;
-        this.coin = 0L;
         this.footprints = 0L;
     }
 
