@@ -26,14 +26,14 @@ public class User extends BaseTimeEntity {
     @Column(nullable = false)
     private Role role;
 
-    private Long footprints;
+    private Long point;
 
     @Builder
     public User(String name, String email, Role role) {
         this.name = name;
         this.email = email;
         this.role = role;
-        this.footprints = 0L;
+        this.point = 0L;
     }
 
     public User update(String name) {
