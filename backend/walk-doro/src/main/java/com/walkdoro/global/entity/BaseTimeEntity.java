@@ -1,4 +1,4 @@
-package com.walkdoro.domain;
+package com.walkdoro.global.entity;
 
 import jakarta.persistence.EntityListeners;
 import jakarta.persistence.MappedSuperclass;

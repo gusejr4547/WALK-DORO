@@ -1,6 +1,7 @@
 package com.walkdoro.domain.user;
 
-import com.walkdoro.domain.BaseTimeEntity;
+import com.walkdoro.domain.user.Role;
+import com.walkdoro.global.entity.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
