@@ -1,0 +1,27 @@
+spring:
+  application:
+    name: walk-doro
+  
+  config:
+    import: optional:file:src/main/resources/application-secret.yml
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/walk_doro?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            scope:
+              - profile
+              - email
