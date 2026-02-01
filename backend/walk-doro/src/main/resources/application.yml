@@ -6,8 +6,17 @@ spring:
     import: optional:file:src/main/resources/application-secret.yml
 
   datasource:
-    url: jdbc:mysql://localhost:3306/walk_doro?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8
-    driver-class-name: com.mysql.cj.jdbc.Driver
+    # url: jdbc:mysql://localhost:3306/walk_doro?useSSL=false&serverTimezone=Asia/Seoul&characterEncoding=UTF-8
+    # driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:h2:mem:testdb
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
 
   jpa:
     hibernate:
@@ -16,6 +25,7 @@ spring:
     properties:
       hibernate:
         format_sql: true
+    defer-datasource-initialization: true
 
   security:
     oauth2:
