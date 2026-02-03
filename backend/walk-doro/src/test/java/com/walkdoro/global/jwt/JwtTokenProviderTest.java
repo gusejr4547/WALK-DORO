@@ -1,5 +1,7 @@
 package com.walkdoro.global.jwt;
 
+import com.walkdoro.global.auth.jwt.JwtTokenParser;
+import com.walkdoro.global.auth.jwt.JwtTokenProvider;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.junit.jupiter.api.BeforeEach;

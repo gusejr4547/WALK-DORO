@@ -1,13 +1,10 @@
-package com.walkdoro.global.jwt;
+package com.walkdoro.global.auth.jwt;
 
-import com.walkdoro.domain.user.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
@@ -28,9 +25,9 @@ public class JwtTokenProvider {
     private final UserDetailsService userDetailsService;
 
     public JwtTokenProvider(@Value("${jwt.secret-key}") String key,
-            @Value("${jwt.expiration}") long expirationTime,
-            JwtTokenParser jwtTokenParser,
-            UserDetailsService userDetailsService) {
+                            @Value("${jwt.expiration}") long expirationTime,
+                            JwtTokenParser jwtTokenParser,
+                            UserDetailsService userDetailsService) {
         this.secretKey = Keys.hmacShaKeyFor(key.getBytes(StandardCharsets.UTF_8));
         this.expirationTime = expirationTime;
         this.jwtTokenParser = jwtTokenParser;
@@ -65,5 +62,9 @@ public class JwtTokenProvider {
         UserDetails userDetails = userDetailsService.loadUserByUsername(claims.getSubject());
 
         return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
+    }
+
+    public boolean validateToken(String token) {
+        return jwtTokenParser.validateToken(token);
     }
 }
