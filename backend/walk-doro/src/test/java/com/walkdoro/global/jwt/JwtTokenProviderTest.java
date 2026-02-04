@@ -2,6 +2,7 @@ package com.walkdoro.global.jwt;
 
 import com.walkdoro.global.auth.jwt.JwtTokenParser;
 import com.walkdoro.global.auth.jwt.JwtTokenProvider;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.junit.jupiter.api.BeforeEach;
@@ -11,6 +12,7 @@ import org.springframework.security.core.Authentication;
 
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
+import java.util.Date;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -79,5 +81,76 @@ class JwtTokenProviderTest {
         // then
         assertThat(authentication).isNotNull();
         assertThat(authentication.getPrincipal()).isEqualTo(userDetails);
+    }
+
+    @Test
+    @DisplayName("createRefreshToken 생성 테스트 - 리프레시 토큰이 정상적으로 생성되어야 한다")
+    void createRefreshToken_Validate() {
+        // given
+        Long userId = 1L;
+        String role = "ROLE_USER";
+
+        // when
+        String refreshToken = jwtTokenProvider.createRefreshToken(userId, role);
+
+        // then
+        assertThat(refreshToken).isNotNull();
+
+        // 검증: 만료 시간이 액세스 토큰보다 길어야 함 (단순 파싱 확인)
+        SecretKey key = Keys.hmacShaKeyFor(secretKeyPlain.getBytes(StandardCharsets.UTF_8));
+        Claims claims = Jwts.parser()
+                .verifyWith(key)
+                .build()
+                .parseSignedClaims(refreshToken)
+                .getPayload();
+
+        assertThat(claims.getSubject()).isEqualTo(userId.toString());
+        // expiration check logic could be refined but existence is key here
+    }
+
+    @Test
+    @DisplayName("validateToken 은 리프레시 토큰에 대해서도 true를 반환해야 한다")
+    void validateToken_ShouldReturnTrue_ForRefreshToken() {
+        // given
+        Long userId = 1L;
+        String role = "ROLE_USER";
+        String refreshToken = jwtTokenProvider.createRefreshToken(userId, role);
+
+        // when
+        boolean isValid = jwtTokenProvider.validateToken(refreshToken);
+
+        // then
+        assertThat(isValid).isTrue();
+    }
+
+    @Test
+    @DisplayName("Refresh Token은 Access Token보다 만료 시간이 길어야 한다")
+    void refreshToken_ShouldHaveLongerExpiration() {
+        // given
+        Long userId = 1L;
+        String role = "ROLE_USER";
+
+        // when
+        String accessToken = jwtTokenProvider.createAccessToken(userId, role);
+        String refreshToken = jwtTokenProvider.createRefreshToken(userId, role);
+
+        // then
+        SecretKey key = Keys.hmacShaKeyFor(secretKeyPlain.getBytes(StandardCharsets.UTF_8));
+
+        Date accessExpiration = Jwts.parser()
+                .verifyWith(key)
+                .build()
+                .parseSignedClaims(accessToken)
+                .getPayload()
+                .getExpiration();
+
+        Date refreshExpiration = Jwts.parser()
+                .verifyWith(key)
+                .build()
+                .parseSignedClaims(refreshToken)
+                .getPayload()
+                .getExpiration();
+
+        assertThat(refreshExpiration).isAfter(accessExpiration);
     }
 }

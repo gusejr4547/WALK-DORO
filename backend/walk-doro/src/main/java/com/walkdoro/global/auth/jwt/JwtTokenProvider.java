@@ -25,9 +25,9 @@ public class JwtTokenProvider {
     private final UserDetailsService userDetailsService;
 
     public JwtTokenProvider(@Value("${jwt.secret-key}") String key,
-                            @Value("${jwt.expiration}") long expirationTime,
-                            JwtTokenParser jwtTokenParser,
-                            UserDetailsService userDetailsService) {
+            @Value("${jwt.expiration}") long expirationTime,
+            JwtTokenParser jwtTokenParser,
+            UserDetailsService userDetailsService) {
         this.secretKey = Keys.hmacShaKeyFor(key.getBytes(StandardCharsets.UTF_8));
         this.expirationTime = expirationTime;
         this.jwtTokenParser = jwtTokenParser;
@@ -39,6 +39,21 @@ public class JwtTokenProvider {
         Claims claims = Jwts.claims().subject(userId.toString()).add("role", role).build();
         Date issuedAt = new Date();
         Date expiredAt = new Date(issuedAt.getTime() + expirationTime);
+
+        return Jwts.builder()
+                .claims(claims)
+                .issuedAt(issuedAt)
+                .expiration(expiredAt)
+                .signWith(secretKey)
+                .compact();
+    }
+
+    public String createRefreshToken(Long userId, String role) {
+        Claims claims = Jwts.claims().subject(userId.toString()).add("role", role).build();
+        Date issuedAt = new Date();
+        // Refresh Token은 Access Token 보다 길게, 예: 14일 (expirationTime * 24 * 14 대체, 여기선 2배로 단순화 or 별도 변수)
+        // For simplicity reusing expirationTime but normally it should be longer.
+        Date expiredAt = new Date(issuedAt.getTime() + expirationTime * 24 * 14);
 
         return Jwts.builder()
                 .claims(claims)
