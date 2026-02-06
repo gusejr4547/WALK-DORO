@@ -7,6 +7,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RestController;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 
 import java.util.Map;
 
@@ -24,5 +26,21 @@ public class AuthController {
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(e.getMessage());
         }
+    }
+
+    @PostMapping("/api/auth/logout")
+    public ResponseEntity<?> logout(@CookieValue(name = "refresh_token", required = false) String refreshToken,
+            HttpServletResponse response) {
+        authService.logout(refreshToken);
+
+        Cookie cookie = new Cookie("refresh_token", null);
+        cookie.setHttpOnly(true);
+        cookie.setSecure(false);
+        cookie.setPath("/");
+        cookie.setMaxAge(0); // 즉시 만료
+
+        response.addCookie(cookie);
+
+        return ResponseEntity.ok("Logged out successfully");
     }
 }

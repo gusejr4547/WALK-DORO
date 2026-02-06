@@ -34,4 +34,10 @@ public class AuthService {
 
         return jwtTokenProvider.createAccessToken(userId, role);
     }
+
+    public void logout(String refreshToken) {
+        if (refreshToken != null) {
+            refreshTokenRepository.delete(refreshToken);
+        }
+    }
 }

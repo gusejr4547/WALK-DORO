@@ -1,5 +1,7 @@
 package com.walkdoro.global.config;
 
+import com.walkdoro.global.auth.jwt.JwtAccessDeniedHandler;
+import com.walkdoro.global.auth.jwt.JwtAuthenticationEntryPoint;
 import com.walkdoro.global.auth.service.MyOAuth2UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.security.autoconfigure.web.servlet.PathRequest;
@@ -21,6 +23,8 @@ public class SecurityConfig {
 
         private final MyOAuth2UserService myOAuth2UserService;
         private final JwtTokenProvider jwtTokenProvider;
+        private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+        private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
 
         @Bean
         public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -32,7 +36,11 @@ public class SecurityConfig {
                                 .authorizeHttpRequests((authorize) -> authorize
                                                 .requestMatchers(PathRequest.toH2Console()).permitAll()
                                                 .requestMatchers("/api/auth/reissue").permitAll()
+                                                .requestMatchers("/api/auth/logout").permitAll()
                                                 .anyRequest().authenticated())
+                                .exceptionHandling(exceptionHandling -> exceptionHandling
+                                                .authenticationEntryPoint(jwtAuthenticationEntryPoint)
+                                                .accessDeniedHandler(jwtAccessDeniedHandler))
                                 .oauth2Login((oauth2) -> oauth2
                                                 .userInfoEndpoint((userInfo) -> userInfo
                                                                 .userService(myOAuth2UserService)))

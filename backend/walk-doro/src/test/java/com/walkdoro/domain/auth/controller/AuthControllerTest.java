@@ -17,6 +17,7 @@ import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.cookie;
 
 @ExtendWith(MockitoExtension.class)
 class AuthControllerTest {
@@ -48,5 +49,21 @@ class AuthControllerTest {
                 .cookie(new Cookie("refresh_token", refreshToken)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.accessToken").value(newAccessToken));
+    }
+
+    @Test
+    @DisplayName("로그아웃 시 리프레시 토큰을 삭제하고 쿠키를 만료시킨다")
+    void logout_ShouldDeleteTokenAndClearCookie() throws Exception {
+        // given
+        String refreshToken = "refresh_token";
+
+        // when & then
+        mockMvc.perform(post("/api/auth/logout")
+                .cookie(new Cookie("refresh_token", refreshToken)))
+                .andExpect(status().isOk())
+                .andExpect(cookie().maxAge("refresh_token", 0));
+
+        // verify service logout called
+        org.mockito.Mockito.verify(authService).logout(refreshToken);
     }
 }
