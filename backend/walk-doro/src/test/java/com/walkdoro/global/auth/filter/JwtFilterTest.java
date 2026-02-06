@@ -75,6 +75,7 @@ class JwtFilterTest {
 
         Authentication authentication = mock(Authentication.class);
         given(jwtTokenProvider.validateToken(validToken)).willReturn(true);
+        given(jwtTokenProvider.isAccessToken(validToken)).willReturn(true);
         given(jwtTokenProvider.getAuthentication(validToken)).willReturn(authentication);
 
         // when
@@ -82,6 +83,7 @@ class JwtFilterTest {
 
         // then
         verify(jwtTokenProvider).validateToken(validToken);
+        verify(jwtTokenProvider).isAccessToken(validToken);
         verify(jwtTokenProvider).getAuthentication(validToken);
         assertThat(SecurityContextHolder.getContext().getAuthentication()).isEqualTo(authentication);
         verify(filterChain).doFilter(request, response);

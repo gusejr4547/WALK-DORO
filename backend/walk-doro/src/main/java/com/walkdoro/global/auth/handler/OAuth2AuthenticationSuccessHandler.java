@@ -5,6 +5,7 @@ import com.walkdoro.domain.user.User;
 import com.walkdoro.domain.user.UserRepository;
 import com.walkdoro.global.auth.jwt.JwtTokenProvider;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -50,7 +51,7 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
                 refreshTokenRepository.save(refreshToken, user.getId(), refreshExpiration);
 
                 // Refresh Token을 HttpOnly Cookie에 설정
-                jakarta.servlet.http.Cookie refreshCookie = new jakarta.servlet.http.Cookie("refresh_token",
+                Cookie refreshCookie = new Cookie("refresh_token",
                                 refreshToken);
                 refreshCookie.setHttpOnly(true);
                 refreshCookie.setSecure(false); // 로컬 개발 환경에서는 false, 배포 시 true (HTTPS 필요)

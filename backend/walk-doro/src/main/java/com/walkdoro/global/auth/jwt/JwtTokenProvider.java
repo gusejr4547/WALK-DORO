@@ -36,7 +36,11 @@ public class JwtTokenProvider {
 
     // 사용자 정보로 엑세스 토큰 만들기
     public String createAccessToken(Long userId, String role) {
-        Claims claims = Jwts.claims().subject(userId.toString()).add("role", role).build();
+        Claims claims = Jwts.claims()
+                .subject(userId.toString())
+                .add("role", role)
+                .add("type", "ACCESS")
+                .build();
         Date issuedAt = new Date();
         Date expiredAt = new Date(issuedAt.getTime() + expirationTime);
 
@@ -49,9 +53,14 @@ public class JwtTokenProvider {
     }
 
     public String createRefreshToken(Long userId, String role) {
-        Claims claims = Jwts.claims().subject(userId.toString()).add("role", role).build();
+        Claims claims = Jwts.claims()
+                .subject(userId.toString())
+                .add("role", role)
+                .add("type", "REFRESH")
+                .build();
         Date issuedAt = new Date();
-        // Refresh Token은 Access Token 보다 길게, 예: 14일 (expirationTime * 24 * 14 대체, 여기선 2배로 단순화 or 별도 변수)
+        // Refresh Token은 Access Token 보다 길게, 예: 14일 (expirationTime * 24 * 14 대체, 여기선
+        // 2배로 단순화 or 별도 변수)
         // For simplicity reusing expirationTime but normally it should be longer.
         Date expiredAt = new Date(issuedAt.getTime() + expirationTime * 24 * 14);
 
@@ -81,5 +90,15 @@ public class JwtTokenProvider {
 
     public boolean validateToken(String token) {
         return jwtTokenParser.validateToken(token);
+    }
+
+    public boolean isAccessToken(String token) {
+        String type = (String) jwtTokenParser.parseClaims(token).get("type");
+        return "ACCESS".equals(type);
+    }
+
+    public boolean isRefreshToken(String token) {
+        String type = (String) jwtTokenParser.parseClaims(token).get("type");
+        return "REFRESH".equals(type);
     }
 }

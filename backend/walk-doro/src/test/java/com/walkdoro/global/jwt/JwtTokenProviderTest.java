@@ -153,4 +153,43 @@ class JwtTokenProviderTest {
 
         assertThat(refreshExpiration).isAfter(accessExpiration);
     }
+
+    @Test
+    @DisplayName("isAccessToken은 ACCESS 타입 토큰에 대해 true를 반환해야 한다")
+    void isAccessToken_ShouldReturnTrue_ForAccessToken() {
+        // given
+        String token = jwtTokenProvider.createAccessToken(1L, "ROLE_USER");
+
+        // when
+        boolean result = jwtTokenProvider.isAccessToken(token);
+
+        // then
+        assertThat(result).isTrue();
+    }
+
+    @Test
+    @DisplayName("isRefreshToken은 REFRESH 타입 토큰에 대해 true를 반환해야 한다")
+    void isRefreshToken_ShouldReturnTrue_ForRefreshToken() {
+        // given
+        String token = jwtTokenProvider.createRefreshToken(1L, "ROLE_USER");
+
+        // when
+        boolean result = jwtTokenProvider.isRefreshToken(token);
+
+        // then
+        assertThat(result).isTrue();
+    }
+
+    @Test
+    @DisplayName("isAccessToken은 REFRESH 타입 토큰에 대해 false를 반환해야 한다")
+    void isAccessToken_ShouldReturnFalse_ForRefreshToken() {
+        // given
+        String token = jwtTokenProvider.createRefreshToken(1L, "ROLE_USER");
+
+        // when
+        boolean result = jwtTokenProvider.isAccessToken(token);
+
+        // then
+        assertThat(result).isFalse();
+    }
 }

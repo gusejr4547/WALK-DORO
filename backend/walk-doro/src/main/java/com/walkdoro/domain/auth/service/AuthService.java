@@ -16,7 +16,8 @@ public class AuthService {
 
     public String reissueAccessToken(String refreshToken) {
         // 1. 토큰 형식 검증
-        if (refreshToken == null || !jwtTokenProvider.validateToken(refreshToken)) {
+        if (refreshToken == null || !jwtTokenProvider.validateToken(refreshToken)
+                || !jwtTokenProvider.isRefreshToken(refreshToken)) {
             throw new IllegalArgumentException("Invalid Refresh Token");
         }
 
