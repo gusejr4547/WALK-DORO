@@ -8,12 +8,14 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 @Component
 @Slf4j
@@ -23,18 +25,15 @@ public class JwtTokenProvider {
     private final SecretKey secretKey;
     private final long expirationTime;
     private final long refreshTokenExpirationTime;
-    private final UserDetailsService userDetailsService;
 
     public JwtTokenProvider(@Value("${jwt.secret-key}") String key,
             @Value("${jwt.expiration}") long expirationTime,
             @Value("${jwt.refresh-expiration}") long refreshTokenExpirationTime,
-            JwtTokenParser jwtTokenParser,
-            UserDetailsService userDetailsService) {
+            JwtTokenParser jwtTokenParser) {
         this.secretKey = Keys.hmacShaKeyFor(key.getBytes(StandardCharsets.UTF_8));
         this.expirationTime = expirationTime;
         this.refreshTokenExpirationTime = refreshTokenExpirationTime;
         this.jwtTokenParser = jwtTokenParser;
-        this.userDetailsService = userDetailsService;
     }
 
     // 사용자 정보로 엑세스 토큰 만들기
@@ -73,20 +72,24 @@ public class JwtTokenProvider {
                 .compact();
     }
 
-    /*
-     * 이 메서드는 “토큰 문자열”을 받아서 Spring Security의 Authentication을 만들어 반환하는 역할이다.
-     * 흐름은 보통:
-     * token → claims 파싱
-     * claims에서 sub(권장: userId) 추출
-     * UserDetailsService로 사용자 로딩
-     * UsernamePasswordAuthenticationToken 생성 후 반환
-     * 즉, 기존에 JwtFilter가 직접 하던 “DB 조회 + Authentication 생성”을 Provider로 옮겨서 필터를 얇게만든다.
-     */
     public Authentication getAuthentication(String token) {
         Claims claims = jwtTokenParser.parseClaims(token);
-        UserDetails userDetails = userDetailsService.loadUserByUsername(claims.getSubject());
 
-        return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
+        // DB 조회 없이 토큰에서 바로 정보 추출
+        String userId = claims.getSubject();
+        String role = claims.get("role", String.class);
+
+        if (role == null) {
+            role = "ROLE_USER"; // Default fallback
+        }
+
+        Collection<? extends GrantedAuthority> authorities = Collections.singleton(new SimpleGrantedAuthority(role));
+
+        // UserDetails 호환성을 위해 Spring Security User 객체 생성 (비밀번호는 빈 값)
+        org.springframework.security.core.userdetails.User principal = new org.springframework.security.core.userdetails.User(
+                userId, "", authorities);
+
+        return new UsernamePasswordAuthenticationToken(principal, "", authorities);
     }
 
     public boolean validateToken(String token) {

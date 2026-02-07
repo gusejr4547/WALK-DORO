@@ -17,25 +17,18 @@ import java.util.Date;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import java.util.Collections;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 class JwtTokenProviderTest {
 
     private JwtTokenProvider jwtTokenProvider;
     private JwtTokenParser jwtTokenParser;
-    private UserDetailsService userDetailsService;
     private final String secretKeyPlain = "testSecretKeyMustBeLongEnoughForHmacSha256bitEncryption";
     private final long expirationTime = 3600000L; // 1 hour
 
     @BeforeEach
     void setUp() {
         jwtTokenParser = new JwtTokenParser(secretKeyPlain);
-        userDetailsService = mock(UserDetailsService.class);
-        jwtTokenProvider = new JwtTokenProvider(secretKeyPlain, expirationTime, expirationTime * 2, jwtTokenParser,
-                userDetailsService);
+        jwtTokenProvider = new JwtTokenProvider(secretKeyPlain, expirationTime, expirationTime * 2, jwtTokenParser);
     }
 
     @Test
@@ -71,17 +64,16 @@ class JwtTokenProviderTest {
         String role = "ROLE_USER";
         String token = jwtTokenProvider.createAccessToken(userId, role);
 
-        UserDetails userDetails = new org.springframework.security.core.userdetails.User(
-                userId.toString(), "", Collections.emptyList());
-
-        when(userDetailsService.loadUserByUsername(userId.toString())).thenReturn(userDetails);
-
         // when
         Authentication authentication = jwtTokenProvider.getAuthentication(token);
 
         // then
         assertThat(authentication).isNotNull();
-        assertThat(authentication.getPrincipal()).isEqualTo(userDetails);
+        // Principal은 UserDetails(User) 타입이어야 함
+        assertThat(authentication.getPrincipal()).isInstanceOf(UserDetails.class);
+        UserDetails principal = (UserDetails) authentication.getPrincipal();
+        assertThat(principal.getUsername()).isEqualTo(userId.toString());
+        assertThat(principal.getAuthorities()).extracting("authority").containsExactly(role);
     }
 
     @Test
