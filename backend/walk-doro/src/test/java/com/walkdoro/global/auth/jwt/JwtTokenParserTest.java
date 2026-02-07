@@ -1,4 +1,4 @@
-package com.walkdoro.global.jwt;
+package com.walkdoro.global.auth.jwt;
 
 import com.walkdoro.global.auth.jwt.JwtTokenParser;
 import io.jsonwebtoken.Claims;
