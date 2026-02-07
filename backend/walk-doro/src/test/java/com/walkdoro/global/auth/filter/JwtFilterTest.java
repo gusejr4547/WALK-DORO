@@ -1,5 +1,6 @@
 package com.walkdoro.global.auth.filter;
 
+import com.walkdoro.domain.auth.repository.RefreshTokenRepository;
 import com.walkdoro.global.auth.jwt.JwtTokenProvider;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -23,12 +24,14 @@ class JwtFilterTest {
 
     private JwtFilter jwtFilter;
     private JwtTokenProvider jwtTokenProvider;
+    private RefreshTokenRepository refreshTokenRepository;
     private FilterChain filterChain;
 
     @BeforeEach
     void setUp() {
         jwtTokenProvider = mock(JwtTokenProvider.class);
-        jwtFilter = new JwtFilter(jwtTokenProvider);
+        refreshTokenRepository = mock(RefreshTokenRepository.class);
+        jwtFilter = new JwtFilter(jwtTokenProvider, refreshTokenRepository);
         filterChain = mock(FilterChain.class);
         SecurityContextHolder.clearContext();
     }

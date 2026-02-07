@@ -36,9 +36,19 @@ public class AuthService {
         return jwtTokenProvider.createAccessToken(userId, role);
     }
 
-    public void logout(String refreshToken) {
+    public void logout(String refreshToken, String accessToken) {
+        // 1. Refresh Token 삭제
         if (refreshToken != null) {
             refreshTokenRepository.delete(refreshToken);
+        }
+
+        // 2. Access Token 블랙리스트 추가 (로그아웃된 토큰)
+        if (accessToken != null && jwtTokenProvider.validateToken(accessToken)) {
+            long expiration = jwtTokenProvider.getExpiration(accessToken);
+            if (expiration > 0) {
+                // Redis에 "BL:AccessToken" 키로 저장 (값: "logout", 만료: 남은 시간)
+                refreshTokenRepository.saveBlackList(accessToken, expiration);
+            }
         }
     }
 }

@@ -64,6 +64,6 @@ class AuthControllerTest {
                 .andExpect(cookie().maxAge("refresh_token", 0));
 
         // verify service logout called
-        org.mockito.Mockito.verify(authService).logout(refreshToken);
+        org.mockito.Mockito.verify(authService).logout(refreshToken, null);
     }
 }

@@ -22,14 +22,17 @@ public class JwtTokenProvider {
     private final JwtTokenParser jwtTokenParser;
     private final SecretKey secretKey;
     private final long expirationTime;
+    private final long refreshTokenExpirationTime;
     private final UserDetailsService userDetailsService;
 
     public JwtTokenProvider(@Value("${jwt.secret-key}") String key,
             @Value("${jwt.expiration}") long expirationTime,
+            @Value("${jwt.refresh-expiration}") long refreshTokenExpirationTime,
             JwtTokenParser jwtTokenParser,
             UserDetailsService userDetailsService) {
         this.secretKey = Keys.hmacShaKeyFor(key.getBytes(StandardCharsets.UTF_8));
         this.expirationTime = expirationTime;
+        this.refreshTokenExpirationTime = refreshTokenExpirationTime;
         this.jwtTokenParser = jwtTokenParser;
         this.userDetailsService = userDetailsService;
     }
@@ -59,10 +62,8 @@ public class JwtTokenProvider {
                 .add("type", "REFRESH")
                 .build();
         Date issuedAt = new Date();
-        // Refresh Token은 Access Token 보다 길게, 예: 14일 (expirationTime * 24 * 14 대체, 여기선
-        // 2배로 단순화 or 별도 변수)
-        // For simplicity reusing expirationTime but normally it should be longer.
-        Date expiredAt = new Date(issuedAt.getTime() + expirationTime * 24 * 14);
+        // Refresh Token은 설정된 만료 시간 사용
+        Date expiredAt = new Date(issuedAt.getTime() + refreshTokenExpirationTime);
 
         return Jwts.builder()
                 .claims(claims)
@@ -100,5 +101,11 @@ public class JwtTokenProvider {
     public boolean isRefreshToken(String token) {
         String type = (String) jwtTokenParser.parseClaims(token).get("type");
         return "REFRESH".equals(type);
+    }
+
+    public long getExpiration(String token) {
+        Date expiration = jwtTokenParser.parseClaims(token).getExpiration();
+        long now = new Date().getTime();
+        return expiration.getTime() - now;
     }
 }

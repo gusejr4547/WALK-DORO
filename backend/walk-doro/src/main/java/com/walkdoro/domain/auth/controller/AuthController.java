@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
@@ -30,8 +31,15 @@ public class AuthController {
 
     @PostMapping("/api/auth/logout")
     public ResponseEntity<?> logout(@CookieValue(name = "refresh_token", required = false) String refreshToken,
+            @RequestHeader(value = "Authorization", required = false) String bearerToken,
             HttpServletResponse response) {
-        authService.logout(refreshToken);
+
+        String accessToken = null;
+        if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
+            accessToken = bearerToken.substring(7);
+        }
+
+        authService.logout(refreshToken, accessToken);
 
         Cookie cookie = new Cookie("refresh_token", null);
         cookie.setHttpOnly(true);

@@ -32,4 +32,13 @@ public class RefreshTokenRepository {
     public void delete(String refreshToken) {
         redisTemplate.delete(refreshToken);
     }
+
+    public void saveBlackList(String accessToken, long expiration) {
+        ValueOperations<String, Object> values = redisTemplate.opsForValue();
+        values.set("BL:" + accessToken, "logout", expiration, TimeUnit.MILLISECONDS);
+    }
+
+    public boolean hasKeyBlackList(String accessToken) {
+        return Boolean.TRUE.equals(redisTemplate.hasKey("BL:" + accessToken));
+    }
 }

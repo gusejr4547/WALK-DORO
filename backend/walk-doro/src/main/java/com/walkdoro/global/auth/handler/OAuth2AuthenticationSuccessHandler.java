@@ -29,8 +29,8 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
         private final UserRepository userRepository;
         private final RefreshTokenRepository refreshTokenRepository;
 
-        @Value("${jwt.expiration}")
-        private long expirationTime; // Access Token Expiration for calculating Refresh (simplification)
+        @Value("${jwt.refresh-expiration}")
+        private long refreshTokenExpiration; // Refresh Token Expiration
 
         @Override
         public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
@@ -47,7 +47,8 @@ public class OAuth2AuthenticationSuccessHandler extends SimpleUrlAuthenticationS
                 String refreshToken = jwtTokenProvider.createRefreshToken(user.getId(), user.getRoleKey());
 
                 // Redis에 저장 (14일)
-                long refreshExpiration = expirationTime * 24 * 14;
+                // Redis에 저장
+                long refreshExpiration = refreshTokenExpiration;
                 refreshTokenRepository.save(refreshToken, user.getId(), refreshExpiration);
 
                 // Refresh Token을 HttpOnly Cookie에 설정

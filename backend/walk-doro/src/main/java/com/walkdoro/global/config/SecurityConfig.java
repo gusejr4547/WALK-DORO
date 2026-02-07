@@ -3,6 +3,7 @@ package com.walkdoro.global.config;
 import com.walkdoro.global.auth.handler.OAuth2AuthenticationSuccessHandler;
 import com.walkdoro.global.auth.jwt.JwtAccessDeniedHandler;
 import com.walkdoro.global.auth.jwt.JwtAuthenticationEntryPoint;
+import com.walkdoro.domain.auth.repository.RefreshTokenRepository;
 import com.walkdoro.global.auth.service.MyOAuth2UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.security.autoconfigure.web.servlet.PathRequest;
@@ -32,6 +33,7 @@ public class SecurityConfig {
         private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
         private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
         private final OAuth2AuthenticationSuccessHandler oAuth2AuthenticationSuccessHandler;
+        private final RefreshTokenRepository refreshTokenRepository;
 
         @Bean
         public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -53,7 +55,7 @@ public class SecurityConfig {
                                                 .userInfoEndpoint((userInfo) -> userInfo
                                                                 .userService(myOAuth2UserService))
                                                 .successHandler(oAuth2AuthenticationSuccessHandler))
-                                .addFilterBefore(new JwtFilter(jwtTokenProvider),
+                                .addFilterBefore(new JwtFilter(jwtTokenProvider, refreshTokenRepository),
                                                 UsernamePasswordAuthenticationFilter.class);
 
                 return http.build();

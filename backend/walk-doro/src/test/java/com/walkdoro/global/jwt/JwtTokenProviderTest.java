@@ -34,7 +34,8 @@ class JwtTokenProviderTest {
     void setUp() {
         jwtTokenParser = new JwtTokenParser(secretKeyPlain);
         userDetailsService = mock(UserDetailsService.class);
-        jwtTokenProvider = new JwtTokenProvider(secretKeyPlain, expirationTime, jwtTokenParser, userDetailsService);
+        jwtTokenProvider = new JwtTokenProvider(secretKeyPlain, expirationTime, expirationTime * 2, jwtTokenParser,
+                userDetailsService);
     }
 
     @Test
