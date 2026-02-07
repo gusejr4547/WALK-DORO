@@ -15,6 +15,7 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
 import com.walkdoro.global.auth.filter.JwtFilter;
 import com.walkdoro.global.auth.jwt.JwtTokenProvider;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
@@ -43,6 +44,8 @@ public class SecurityConfig {
                                 // H2 Console 사용을 위해
                                 .headers(headers -> headers
                                                 .frameOptions(HeadersConfigurer.FrameOptionsConfig::sameOrigin))
+                                .sessionManagement((session) -> session
+                                                .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                                 .authorizeHttpRequests((authorize) -> authorize
                                                 .requestMatchers(PathRequest.toH2Console()).permitAll()
                                                 .requestMatchers("/api/auth/reissue").permitAll()
