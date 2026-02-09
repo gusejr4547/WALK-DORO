@@ -28,14 +28,22 @@ public class DailyStat extends BaseTimeEntity {
     @Column(nullable = false)
     private Integer stepCount;
 
+    @Column(nullable = false)
+    private Long rewardedPoints;
+
     @Builder
     public DailyStat(User user, LocalDate date, Integer stepCount) {
         this.user = user;
         this.date = date;
         this.stepCount = stepCount;
+        this.rewardedPoints = 0L;
     }
 
     public void updateStepCount(Integer stepCount) {
         this.stepCount = stepCount;
+    }
+
+    public void addRewardedPoints(Long points) {
+        this.rewardedPoints += points;
     }
 }
