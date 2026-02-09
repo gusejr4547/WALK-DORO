@@ -42,6 +42,10 @@ public class User extends BaseTimeEntity {
         return this;
     }
 
+    public void addPoint(Long amount) {
+        this.point += amount;
+    }
+
     public String getRoleKey() {
         return this.role.getKey();
     }
