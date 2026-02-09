@@ -23,7 +23,7 @@ public class OAuthAttributes {
     }
 
     public static OAuthAttributes of(String registrationId, String userNameAttributeName,
-                                     Map<String, Object> attributes) {
+            Map<String, Object> attributes) {
         // 추후 네이버, 카카오 등 추가 시 분기 처리 예: if("naver".equals(registrationId)) ...
         if ("google".equals(registrationId)) {
             return ofGoogle(userNameAttributeName, attributes);
@@ -45,7 +45,7 @@ public class OAuthAttributes {
         return User.builder()
                 .name(name)
                 .email(email)
-                .role(Role.user) // Role.user
+                .role(Role.USER) // Role.user
                 .build();
     }
 }
