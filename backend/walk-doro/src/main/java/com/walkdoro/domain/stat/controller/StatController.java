@@ -13,7 +13,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.nio.file.attribute.UserPrincipal;
+import com.walkdoro.domain.stat.dto.StatListResponse;
+import java.time.LocalDate;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @RequiredArgsConstructor
 @RestController("/api/v1/stats")
@@ -21,7 +24,8 @@ public class StatController {
     private final StatService statService;
 
     @PostMapping("/steps")
-    public ResponseEntity<StepSyncResponse> syncSteps(@RequestBody StepSyncRequest stepSyncRequest,
+    public ResponseEntity<StepSyncResponse> syncSteps(
+            @RequestBody StepSyncRequest stepSyncRequest,
             @AuthenticationPrincipal UserDetails userDetails) {
         Long id = Long.parseLong(userDetails.getUsername());
         StepSyncResponse response = statService.syncSteps(id, stepSyncRequest);
@@ -32,13 +36,13 @@ public class StatController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping("/daily")
-    public ResponseEntity<?> getDailyStat() {
-        return ResponseEntity.ok(null);
-    }
-
-    @GetMapping("/weekly")
-    public ResponseEntity<?> getWeeklyStats() {
-        return ResponseEntity.ok(null);
+    @GetMapping
+    public ResponseEntity<StatListResponse> getStats(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+            @AuthenticationPrincipal UserDetails userDetails) {
+        Long userId = Long.parseLong(userDetails.getUsername());
+        StatListResponse response = statService.getStats(userId, startDate, endDate);
+        return ResponseEntity.ok(response);
     }
 }
