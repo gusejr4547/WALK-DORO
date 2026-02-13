@@ -8,22 +8,21 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.walkdoro.domain.stat.dto.StatListResponse;
+
 import java.time.LocalDate;
+
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.web.bind.annotation.RequestParam;
 
 @RequiredArgsConstructor
-@RestController("/api/v1/stats")
+@RequestMapping("/api/v1")
+@RestController()
 public class StatController {
     private final StatService statService;
 
-    @PostMapping("/steps")
+    @PostMapping("/stats/steps")
     public ResponseEntity<StepSyncResponse> syncSteps(
             @RequestBody StepSyncRequest stepSyncRequest,
             @AuthenticationPrincipal UserDetails userDetails) {
@@ -36,7 +35,7 @@ public class StatController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping
+    @GetMapping("/stats")
     public ResponseEntity<StatListResponse> getStats(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
@@ -45,4 +44,5 @@ public class StatController {
         StatListResponse response = statService.getStats(userId, startDate, endDate);
         return ResponseEntity.ok(response);
     }
+
 }
