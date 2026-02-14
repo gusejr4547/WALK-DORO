@@ -12,6 +12,9 @@ import java.time.LocalDate;
 @Getter
 @NoArgsConstructor
 @Entity
+@Table(uniqueConstraints = {
+        @UniqueConstraint(name = "uk_daily_stat_user_date", columnNames = {"user_id", "date"})
+})
 public class DailyStat extends BaseTimeEntity {
 
     @Id
@@ -19,7 +22,7 @@ public class DailyStat extends BaseTimeEntity {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     @Column(nullable = false)
