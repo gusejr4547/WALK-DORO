@@ -11,6 +11,7 @@ import com.walkdoro.domain.user.UserRepository;
 import java.time.LocalDate;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,10 +33,10 @@ public class StatService {
                                         if (dailyStat.getStepCount() < sentSteps) {
                                                 dailyStat.updateStepCount(sentSteps);
                                                 return StepSyncResponse.updated(sentSteps, dailyStat.getStepCount(),
-                                                                dailyStat.getRewardedPoints());
+                                                                dailyStat.getRewardBitMask());
                                         }
                                         return StepSyncResponse.ignored(sentSteps, dailyStat.getStepCount(),
-                                                        dailyStat.getRewardedPoints());
+                                                        dailyStat.getRewardBitMask());
                                 })
                                 .orElseGet(() -> {
                                         DailyStat dailyStat = DailyStat.builder()
@@ -43,9 +44,26 @@ public class StatService {
                                                         .date(stepSyncRequest.date())
                                                         .stepCount(sentSteps)
                                                         .build();
-                                        statRepository.save(dailyStat);
-                                        return StepSyncResponse.created(sentSteps, dailyStat.getStepCount(),
-                                                        dailyStat.getRewardedPoints());
+                                        try {
+                                                statRepository.saveAndFlush(dailyStat);
+                                                return StepSyncResponse.created(sentSteps, dailyStat.getStepCount(),
+                                                                dailyStat.getRewardBitMask());
+                                        } catch (DataIntegrityViolationException e) {
+                                                return statRepository.findByUserAndDate(user, stepSyncRequest.date())
+                                                                .map(existing -> {
+                                                                        if (existing.getStepCount() < sentSteps) {
+                                                                                existing.updateStepCount(sentSteps);
+                                                                                return StepSyncResponse.updated(
+                                                                                                sentSteps,
+                                                                                                existing.getStepCount(),
+                                                                                                existing.getRewardBitMask());
+                                                                        }
+                                                                        return StepSyncResponse.ignored(sentSteps,
+                                                                                        existing.getStepCount(),
+                                                                                        existing.getRewardBitMask());
+                                                                })
+                                                                .orElseThrow(() -> e);
+                                        }
                                 });
         }
 
