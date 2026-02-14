@@ -8,7 +8,7 @@ public record StatListResponse(
         Long totalPoints) {
     public static StatListResponse of(List<DailyStatResponse> dailyStats) {
         int totalSteps = dailyStats.stream().mapToInt(DailyStatResponse::stepCount).sum();
-        long totalPoints = dailyStats.stream().mapToLong(DailyStatResponse::rewardedPoints).sum();
+        long totalPoints = dailyStats.stream().mapToLong(DailyStatResponse::getRewardedPoints).sum();
         return new StatListResponse(dailyStats, totalSteps, totalPoints);
     }
 }
