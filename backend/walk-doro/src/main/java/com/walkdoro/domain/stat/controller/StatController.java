@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+import jakarta.validation.Valid;
 
 import com.walkdoro.domain.stat.dto.StatListResponse;
 
@@ -24,7 +25,7 @@ public class StatController {
 
     @PostMapping("/stats/steps")
     public ResponseEntity<StepSyncResponse> syncSteps(
-            @RequestBody StepSyncRequest stepSyncRequest,
+            @Valid @RequestBody StepSyncRequest stepSyncRequest,
             @AuthenticationPrincipal UserDetails userDetails) {
         Long id = Long.parseLong(userDetails.getUsername());
         StepSyncResponse response = statService.syncSteps(id, stepSyncRequest);
