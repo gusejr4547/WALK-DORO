@@ -20,14 +20,15 @@ public interface StatRepository extends JpaRepository<DailyStat, Long> {
     Optional<DailyStat> findByUserAndDate(User user, LocalDate date);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
-    Optional<DailyStat> findByUserAndDateWithLock(User user, LocalDate date);
+    @Query("SELECT d FROM DailyStat d WHERE d.user = :user AND d.date = :date")
+    Optional<DailyStat> findByUserAndDateWithLock(@Param("user") User user, @Param("date") LocalDate date);
 
     @Modifying
     @Query(value = """
             INSERT INTO daily_stat (user_id, date, step_count, reward_bit_mask, created_at, modified_at)
             VALUES (:userId, :date, :steps, 0, NOW(), NOW())
             ON DUPLICATE KEY UPDATE
-                step_count = GREATEST(daily_stat.step_count, :steps),
+                step_count = IF(:steps > daily_stat.step_count, :steps, daily_stat.step_count),
                 modified_at = IF(:steps > daily_stat.step_count, NOW(), daily_stat.modified_at)
             """, nativeQuery = true)
     int upsertSteps(@Param("userId") Long userId, @Param("date") LocalDate date, @Param("steps") Integer steps);

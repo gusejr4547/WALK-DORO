@@ -14,6 +14,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.walkdoro.global.error.exception.BusinessException;
+import com.walkdoro.global.error.ErrorCode;
+
 @RequiredArgsConstructor
 @Service
 public class StatService {
@@ -23,7 +26,7 @@ public class StatService {
         @Transactional
         public StepSyncResponse syncSteps(Long userId, StepSyncRequest stepSyncRequest) {
                 User user = userRepository.findById(userId)
-                                .orElseThrow(() -> new IllegalArgumentException("해당 ID의 사용자를 찾을 수 없습니다."));
+                                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
                 Integer sentSteps = stepSyncRequest.steps();
                 int upsertResult = statRepository.upsertSteps(userId, stepSyncRequest.date(), sentSteps);
@@ -32,11 +35,11 @@ public class StatService {
                         case 1 -> StepSyncResponse.Status.CREATED;
                         case 2 -> StepSyncResponse.Status.UPDATED;
                         case 0 -> StepSyncResponse.Status.IGNORED;
-                        default -> throw new IllegalStateException("예상치 못한 업서트 결과입니다: " + upsertResult);
+                        default -> throw new BusinessException(ErrorCode.STAT_UPSERT_FAILED);
                 };
 
                 DailyStat dailyStat = statRepository.findByUserAndDate(user, stepSyncRequest.date())
-                                .orElseThrow(() -> new IllegalStateException("업서트 후 데이터 조회에 실패했습니다."));
+                                .orElseThrow(() -> new BusinessException(ErrorCode.STAT_LOOKUP_FAILED));
 
                 return new StepSyncResponse(status, sentSteps, dailyStat.getStepCount(), dailyStat.getRewardBitMask());
         }
@@ -44,7 +47,7 @@ public class StatService {
         @Transactional(readOnly = true)
         public StatListResponse getStats(Long userId, LocalDate startDate, LocalDate endDate) {
                 User user = userRepository.findById(userId)
-                                .orElseThrow(() -> new IllegalArgumentException("해당 ID의 사용자를 찾을 수 없습니다."));
+                                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
                 List<DailyStat> stats = statRepository.findAllByUserAndDateBetween(user, startDate, endDate);
 

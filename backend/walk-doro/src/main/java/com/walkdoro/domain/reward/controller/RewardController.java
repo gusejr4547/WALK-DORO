@@ -24,11 +24,7 @@ public class RewardController {
             @Valid @RequestBody RewardClaimRequest request,
             @AuthenticationPrincipal UserDetails userDetails) {
         Long userId = Long.parseLong(userDetails.getUsername());
-        try {
-            RewardClaimResponse response = rewardService.claimReward(userId, request);
-            return ResponseEntity.ok(response);
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().build();
-        }
+        RewardClaimResponse response = rewardService.claimReward(userId, request);
+        return ResponseEntity.ok(response);
     }
 }

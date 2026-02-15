@@ -17,8 +17,12 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.verify;
+
+import com.walkdoro.global.error.exception.BusinessException;
+import com.walkdoro.global.error.ErrorCode;
 
 @ExtendWith(MockitoExtension.class)
 class StatServiceTest {
@@ -110,5 +114,20 @@ class StatServiceTest {
 
         assertThat(response.status()).isEqualTo(StepSyncResponse.Status.IGNORED);
         assertThat(response.storedStepCount()).isEqualTo(storedSteps);
+    }
+
+    @Test
+    @DisplayName("Throws exception when user not found")
+    void syncSteps_ShouldThrow_WhenUserNotFound() {
+        Long userId = 999L;
+        LocalDate date = LocalDate.of(2024, 1, 1);
+        int steps = 1000;
+
+        given(userRepository.findById(userId)).willReturn(Optional.empty());
+
+        assertThatThrownBy(() -> statService.syncSteps(userId, new StepSyncRequest(date, steps)))
+                .isInstanceOf(BusinessException.class)
+                .extracting("errorCode")
+                .isEqualTo(ErrorCode.USER_NOT_FOUND);
     }
 }

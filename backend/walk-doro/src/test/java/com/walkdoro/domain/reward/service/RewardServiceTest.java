@@ -7,6 +7,8 @@ import com.walkdoro.domain.stat.repository.StatRepository;
 import com.walkdoro.domain.user.User;
 import com.walkdoro.domain.user.UserRepository;
 import java.time.LocalDate;
+import com.walkdoro.global.error.exception.BusinessException;
+import com.walkdoro.global.error.ErrorCode;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -112,8 +114,9 @@ class RewardServiceTest {
         given(statRepository.findByUserAndDateWithLock(user, date)).willReturn(Optional.of(dailyStat));
 
         assertThatThrownBy(() -> rewardService.claimReward(userId, new RewardClaimRequest(date, goalSteps)))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("이미 해당 구간의 보상을 수령했습니다.");
+                .isInstanceOf(BusinessException.class)
+                .extracting("errorCode")
+                .isEqualTo(ErrorCode.REWARD_ALREADY_CLAIMED);
     }
 
     @Test
@@ -130,7 +133,9 @@ class RewardServiceTest {
         given(statRepository.findByUserAndDateWithLock(user, date)).willReturn(Optional.of(dailyStat));
 
         assertThatThrownBy(() -> rewardService.claimReward(userId, new RewardClaimRequest(date, goalSteps)))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(BusinessException.class)
+                .extracting("errorCode")
+                .isEqualTo(ErrorCode.INVALID_REWARD_STEP_UNIT);
     }
 
     @Test
@@ -147,6 +152,8 @@ class RewardServiceTest {
         given(statRepository.findByUserAndDateWithLock(user, date)).willReturn(Optional.of(dailyStat));
 
         assertThatThrownBy(() -> rewardService.claimReward(userId, new RewardClaimRequest(date, goalSteps)))
-                .isInstanceOf(IllegalArgumentException.class);
+                .isInstanceOf(BusinessException.class)
+                .extracting("errorCode")
+                .isEqualTo(ErrorCode.REWARD_GOAL_NOT_REACHED);
     }
 }

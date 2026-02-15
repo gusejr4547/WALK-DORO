@@ -9,6 +9,8 @@ import com.walkdoro.domain.user.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import com.walkdoro.global.error.exception.BusinessException;
+import com.walkdoro.global.error.ErrorCode;
 
 @RequiredArgsConstructor
 @Service
@@ -19,20 +21,20 @@ public class RewardService {
     @Transactional
     public RewardClaimResponse claimReward(Long userId, RewardClaimRequest request) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("id에 해당하는 유저가 없습니다."));
+                .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
         DailyStat dailyStat = statRepository.findByUserAndDateWithLock(user, request.date())
-                .orElseThrow(() -> new IllegalArgumentException("해당 날짜의 기록이 없습니다."));
+                .orElseThrow(() -> new BusinessException(ErrorCode.STAT_NOT_FOUND));
 
         int goalSteps = request.goalSteps();
         validateGoalSteps(goalSteps);
 
         if (dailyStat.getStepCount() < goalSteps) {
-            throw new IllegalArgumentException("아직 목표 걸음 수에 도달하지 못했습니다.");
+            throw new BusinessException(ErrorCode.REWARD_GOAL_NOT_REACHED);
         }
 
         if (dailyStat.isRewardClaimed(goalSteps)) {
-            throw new IllegalArgumentException("이미 해당 구간의 보상을 수령했습니다.");
+            throw new BusinessException(ErrorCode.REWARD_ALREADY_CLAIMED);
         }
 
         long pointsToAdd = 1L;
@@ -45,13 +47,13 @@ public class RewardService {
     private void validateGoalSteps(int goalSteps) {
         if (goalSteps <= 10000) {
             if (goalSteps <= 0 || goalSteps % 1000 != 0) {
-                throw new IllegalArgumentException("10000보 이하에서는 1000보 단위로만 보상을 수령할 수 있습니다.");
+                throw new BusinessException(ErrorCode.INVALID_REWARD_STEP_UNIT);
             }
             return;
         }
 
         if (goalSteps % 2000 != 0) {
-            throw new IllegalArgumentException("10000보 초과 구간에서는 2000보 단위로만 보상을 수령할 수 있습니다.");
+            throw new BusinessException(ErrorCode.INVALID_REWARD_STEP_UNIT);
         }
     }
 }
