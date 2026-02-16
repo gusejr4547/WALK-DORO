@@ -1,5 +1,6 @@
 package com.walkdoro.global.auth.jwt;
 
+import com.walkdoro.global.auth.annotation.loginUser.UserAdapter;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
@@ -14,6 +15,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
@@ -27,9 +29,9 @@ public class JwtTokenProvider {
     private final long refreshTokenExpirationTime;
 
     public JwtTokenProvider(@Value("${jwt.secret-key}") String key,
-            @Value("${jwt.expiration}") long expirationTime,
-            @Value("${jwt.refresh-expiration}") long refreshTokenExpirationTime,
-            JwtTokenParser jwtTokenParser) {
+                            @Value("${jwt.expiration}") long expirationTime,
+                            @Value("${jwt.refresh-expiration}") long refreshTokenExpirationTime,
+                            JwtTokenParser jwtTokenParser) {
         this.secretKey = Keys.hmacShaKeyFor(key.getBytes(StandardCharsets.UTF_8));
         this.expirationTime = expirationTime;
         this.refreshTokenExpirationTime = refreshTokenExpirationTime;
@@ -83,13 +85,10 @@ public class JwtTokenProvider {
             role = "ROLE_USER"; // Default fallback
         }
 
-        Collection<? extends GrantedAuthority> authorities = Collections.singleton(new SimpleGrantedAuthority(role));
+        // UserAdapter를 사용해서 principal 만듬
+        UserAdapter principal = new UserAdapter(userId, role);
 
-        // UserDetails 호환성을 위해 Spring Security User 객체 생성 (비밀번호는 빈 값)
-        org.springframework.security.core.userdetails.User principal = new org.springframework.security.core.userdetails.User(
-                userId, "", authorities);
-
-        return new UsernamePasswordAuthenticationToken(principal, "", authorities);
+        return new UsernamePasswordAuthenticationToken(principal, "", principal.getAuthorities());
     }
 
     public boolean validateToken(String token) {

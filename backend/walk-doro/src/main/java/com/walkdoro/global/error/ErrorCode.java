@@ -24,7 +24,10 @@ public enum ErrorCode {
     REWARD_ALREADY_CLAIMED(HttpStatus.BAD_REQUEST, "R001", "이미 보상을 수령했습니다."),
     REWARD_CONDITION_NOT_MET(HttpStatus.BAD_REQUEST, "R002", "보상 수령 조건을 만족하지 못했습니다."),
     REWARD_GOAL_NOT_REACHED(HttpStatus.BAD_REQUEST, "R003", "아직 목표 걸음 수에 도달하지 못했습니다."),
-    INVALID_REWARD_STEP_UNIT(HttpStatus.BAD_REQUEST, "R004", "보상 수령 단위가 올바르지 않습니다.");
+    INVALID_REWARD_STEP_UNIT(HttpStatus.BAD_REQUEST, "R004", "보상 수령 단위가 올바르지 않습니다."),
+
+    // Auth
+    UNAUTHORIZED_USER(HttpStatus.UNAUTHORIZED, "A001", "로그인이 필요합니다.");
 
     private final HttpStatus status;
     private final String code;
