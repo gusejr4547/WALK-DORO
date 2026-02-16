@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import jakarta.validation.Valid;
+import com.walkdoro.global.auth.annotation.loginUser.LoginUser;
 
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/rewards")
@@ -22,8 +23,7 @@ public class RewardController {
     @PostMapping("/claims")
     public ResponseEntity<RewardClaimResponse> claimReward(
             @Valid @RequestBody RewardClaimRequest request,
-            @AuthenticationPrincipal UserDetails userDetails) {
-        Long userId = Long.parseLong(userDetails.getUsername());
+            @LoginUser Long userId) {
         RewardClaimResponse response = rewardService.claimReward(userId, request);
         return ResponseEntity.ok(response);
     }

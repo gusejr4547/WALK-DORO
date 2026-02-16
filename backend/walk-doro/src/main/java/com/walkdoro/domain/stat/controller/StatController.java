@@ -16,6 +16,7 @@ import com.walkdoro.domain.stat.dto.StatListResponse;
 import java.time.LocalDate;
 
 import org.springframework.format.annotation.DateTimeFormat;
+import com.walkdoro.global.auth.annotation.loginUser.LoginUser;
 
 @RequiredArgsConstructor
 @RequestMapping("/api/v1")
@@ -26,9 +27,8 @@ public class StatController {
     @PostMapping("/stats/steps")
     public ResponseEntity<StepSyncResponse> syncSteps(
             @Valid @RequestBody StepSyncRequest stepSyncRequest,
-            @AuthenticationPrincipal UserDetails userDetails) {
-        Long id = Long.parseLong(userDetails.getUsername());
-        StepSyncResponse response = statService.syncSteps(id, stepSyncRequest);
+            @LoginUser Long userId) {
+        StepSyncResponse response = statService.syncSteps(userId, stepSyncRequest);
 
         if (response.status() == StepSyncResponse.Status.CREATED) {
             return ResponseEntity.status(HttpStatus.CREATED).body(response);
@@ -40,8 +40,7 @@ public class StatController {
     public ResponseEntity<StatListResponse> getStats(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
-            @AuthenticationPrincipal UserDetails userDetails) {
-        Long userId = Long.parseLong(userDetails.getUsername());
+            @LoginUser Long userId) {
         StatListResponse response = statService.getStats(userId, startDate, endDate);
         return ResponseEntity.ok(response);
     }
