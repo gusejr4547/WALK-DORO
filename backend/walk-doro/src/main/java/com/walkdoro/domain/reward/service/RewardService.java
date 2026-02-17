@@ -39,6 +39,7 @@ public class RewardService {
 
         long pointsToAdd = 1L;
         dailyStat.claimReward(goalSteps);
+        statRepository.saveAndFlush(dailyStat);
         userRepository.updatePoint(userId, pointsToAdd);
 
         return new RewardClaimResponse(pointsToAdd, user.getPoint() + pointsToAdd);
