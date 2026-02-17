@@ -28,8 +28,8 @@ public interface StatRepository extends JpaRepository<DailyStat, Long> {
             INSERT INTO daily_stat (user_id, date, step_count, reward_bit_mask, created_at, modified_at)
             VALUES (:userId, :date, :steps, 0, NOW(), NOW())
             ON DUPLICATE KEY UPDATE
-                step_count = IF(:steps > daily_stat.step_count, :steps, daily_stat.step_count),
-                modified_at = IF(:steps > daily_stat.step_count, NOW(), daily_stat.modified_at)
+                step_count = CASE WHEN :steps > daily_stat.step_count THEN :steps ELSE daily_stat.step_count END,
+                modified_at = CASE WHEN :steps > daily_stat.step_count THEN NOW() ELSE daily_stat.modified_at END
             """, nativeQuery = true)
     int upsertSteps(@Param("userId") Long userId, @Param("date") LocalDate date, @Param("steps") Integer steps);
 }
