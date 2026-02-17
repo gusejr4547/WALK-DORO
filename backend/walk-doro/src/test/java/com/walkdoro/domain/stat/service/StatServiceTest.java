@@ -130,4 +130,43 @@ class StatServiceTest {
                 .extracting("errorCode")
                 .isEqualTo(ErrorCode.USER_NOT_FOUND);
     }
+
+    @Test
+    @DisplayName("Throws exception when upsert result is invalid")
+    void syncSteps_ShouldThrow_WhenUpsertResultIsInvalid() {
+        Long userId = 1L;
+        LocalDate date = LocalDate.of(2024, 1, 1);
+        int steps = 1000;
+
+        User user = User.builder().build();
+        ReflectionTestUtils.setField(user, "id", userId);
+
+        given(userRepository.findById(userId)).willReturn(Optional.of(user));
+        given(statRepository.upsertSteps(userId, date, steps)).willReturn(-1);
+
+        assertThatThrownBy(() -> statService.syncSteps(userId, new StepSyncRequest(date, steps)))
+                .isInstanceOf(BusinessException.class)
+                .extracting("errorCode")
+                .isEqualTo(ErrorCode.STAT_UPSERT_FAILED);
+    }
+
+    @Test
+    @DisplayName("Throws exception when stat lookup fails after upsert")
+    void syncSteps_ShouldThrow_WhenLookupFailsAfterUpsert() {
+        Long userId = 1L;
+        LocalDate date = LocalDate.of(2024, 1, 1);
+        int steps = 1000;
+
+        User user = User.builder().build();
+        ReflectionTestUtils.setField(user, "id", userId);
+
+        given(userRepository.findById(userId)).willReturn(Optional.of(user));
+        given(statRepository.upsertSteps(userId, date, steps)).willReturn(1);
+        given(statRepository.findByUserAndDate(user, date)).willReturn(Optional.empty());
+
+        assertThatThrownBy(() -> statService.syncSteps(userId, new StepSyncRequest(date, steps)))
+                .isInstanceOf(BusinessException.class)
+                .extracting("errorCode")
+                .isEqualTo(ErrorCode.STAT_LOOKUP_FAILED);
+    }
 }
