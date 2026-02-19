@@ -23,14 +23,19 @@ public class Item extends BaseTimeEntity {
     @Column(nullable = false)
     private ItemGrade grade;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private ItemCategory category;
+
     private String imageUrl;
 
     private String description;
 
     @Builder
-    public Item(String name, ItemGrade grade, String imageUrl, String description) {
+    public Item(String name, ItemGrade grade, ItemCategory category, String imageUrl, String description) {
         this.name = name;
         this.grade = grade;
+        this.category = category;
         this.imageUrl = imageUrl;
         this.description = description;
     }

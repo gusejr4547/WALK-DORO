@@ -46,6 +46,17 @@ public class User extends BaseTimeEntity {
         this.point += amount;
     }
 
+    public boolean hasEnoughPoint(Long amount) {
+        return this.point >= amount;
+    }
+
+    public void deductPoint(Long amount) {
+        if (!hasEnoughPoint(amount)) {
+            throw new IllegalArgumentException("Not enough point");
+        }
+        this.point -= amount;
+    }
+
     public String getRoleKey() {
         return this.role.getKey();
     }
