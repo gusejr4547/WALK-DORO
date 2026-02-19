@@ -14,7 +14,7 @@ import com.walkdoro.domain.stat.dto.StatListResponse;
 import java.time.LocalDate;
 
 import org.springframework.format.annotation.DateTimeFormat;
-import com.walkdoro.global.auth.annotation.loginuser.LoginUser;
+import com.walkdoro.global.auth.annotation.LoginUser;
 
 @RequiredArgsConstructor
 @RequestMapping("/api/v1")

@@ -1,8 +1,7 @@
 package com.walkdoro.global.auth.resolver;
 
-import com.walkdoro.global.auth.annotation.loginuser.LoginUser;
-import com.walkdoro.global.auth.annotation.loginuser.UserAdapter;
-import com.walkdoro.global.auth.annotation.loginuser.LoginUserArgumentResolver;
+import com.walkdoro.global.auth.annotation.LoginUser;
+import com.walkdoro.global.auth.dto.UserAdapter;
 import com.walkdoro.global.error.ErrorCode;
 import com.walkdoro.global.error.exception.BusinessException;
 import org.junit.jupiter.api.BeforeEach;

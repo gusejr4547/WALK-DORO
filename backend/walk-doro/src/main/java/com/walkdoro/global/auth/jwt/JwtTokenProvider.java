@@ -1,6 +1,6 @@
 package com.walkdoro.global.auth.jwt;
 
-import com.walkdoro.global.auth.annotation.loginuser.UserAdapter;
+import com.walkdoro.global.auth.dto.UserAdapter;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;

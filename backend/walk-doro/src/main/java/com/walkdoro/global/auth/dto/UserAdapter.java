@@ -1,4 +1,4 @@
-package com.walkdoro.global.auth.annotation.loginuser;
+package com.walkdoro.global.auth.dto;
 
 import lombok.Getter;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
