@@ -1,6 +1,6 @@
 package com.walkdoro.global.config;
 
-import com.walkdoro.global.auth.annotation.loginUser.LoginUserArgumentResolver;
+import com.walkdoro.global.auth.annotation.loginuser.LoginUserArgumentResolver;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;

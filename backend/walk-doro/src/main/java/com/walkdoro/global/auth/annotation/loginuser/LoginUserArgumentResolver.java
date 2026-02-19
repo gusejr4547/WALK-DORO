@@ -1,6 +1,5 @@
-package com.walkdoro.global.auth.annotation.loginUser;
+package com.walkdoro.global.auth.annotation.loginuser;
 
-import com.walkdoro.domain.user.User;
 import com.walkdoro.global.error.ErrorCode;
 import com.walkdoro.global.error.exception.BusinessException;
 import lombok.RequiredArgsConstructor;

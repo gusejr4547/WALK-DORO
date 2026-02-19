@@ -6,8 +6,6 @@ import com.walkdoro.domain.stat.service.StatService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import jakarta.validation.Valid;
 
@@ -16,7 +14,7 @@ import com.walkdoro.domain.stat.dto.StatListResponse;
 import java.time.LocalDate;
 
 import org.springframework.format.annotation.DateTimeFormat;
-import com.walkdoro.global.auth.annotation.loginUser.LoginUser;
+import com.walkdoro.global.auth.annotation.loginuser.LoginUser;
 
 @RequiredArgsConstructor
 @RequestMapping("/api/v1")

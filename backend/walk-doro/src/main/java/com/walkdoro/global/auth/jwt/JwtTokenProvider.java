@@ -1,6 +1,6 @@
 package com.walkdoro.global.auth.jwt;
 
-import com.walkdoro.global.auth.annotation.loginUser.UserAdapter;
+import com.walkdoro.global.auth.annotation.loginuser.UserAdapter;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
@@ -12,12 +12,7 @@ import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
-
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 @Component
 @Slf4j

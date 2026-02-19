@@ -1,4 +1,4 @@
-package com.walkdoro.global.auth.annotation.loginUser;
+package com.walkdoro.global.auth.annotation.loginuser;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
