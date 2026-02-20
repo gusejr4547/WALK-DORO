@@ -5,7 +5,7 @@ import com.walkdoro.domain.stat.DailyStat;
 import com.walkdoro.domain.stat.repository.StatRepository;
 import com.walkdoro.domain.user.Role;
 import com.walkdoro.domain.user.User;
-import com.walkdoro.domain.user.UserRepository;
+import com.walkdoro.domain.user.repository.UserRepository;
 import com.walkdoro.global.error.ErrorCode;
 import com.walkdoro.global.error.exception.BusinessException;
 import java.time.LocalDate;

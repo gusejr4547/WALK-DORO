@@ -3,11 +3,10 @@ package com.walkdoro.global.config;
 import com.walkdoro.domain.item.Item;
 import com.walkdoro.domain.item.ItemCategory;
 import com.walkdoro.domain.item.ItemGrade;
-import com.walkdoro.domain.item.ItemRepository;
+import com.walkdoro.domain.item.repository.ItemRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 

@@ -2,13 +2,13 @@ package com.walkdoro.domain.randombox.service;
 
 import com.walkdoro.domain.item.Item;
 import com.walkdoro.domain.inventory.Inventory;
-import com.walkdoro.domain.inventory.InventoryRepository;
+import com.walkdoro.domain.inventory.repository.InventoryRepository;
 import com.walkdoro.domain.item.ItemGrade;
-import com.walkdoro.domain.item.ItemRepository;
+import com.walkdoro.domain.item.repository.ItemRepository;
 import com.walkdoro.domain.randombox.type.RandomBoxType;
 import com.walkdoro.global.util.RandomGenerator;
 import com.walkdoro.domain.user.User;
-import com.walkdoro.domain.user.UserRepository;
+import com.walkdoro.domain.user.repository.UserRepository;
 import com.walkdoro.global.error.ErrorCode;
 import com.walkdoro.global.error.exception.BusinessException;
 import lombok.RequiredArgsConstructor;

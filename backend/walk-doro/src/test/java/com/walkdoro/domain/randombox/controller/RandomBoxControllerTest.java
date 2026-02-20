@@ -75,8 +75,8 @@ class RandomBoxControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(requestBody))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].name").value("Sample Item"))
-                .andExpect(jsonPath("$[0].grade").value("COMMON"));
+                .andExpect(jsonPath("$.items[0].name").value("Sample Item"))
+                .andExpect(jsonPath("$.items[0].grade").value("COMMON"));
     }
 
     @Test

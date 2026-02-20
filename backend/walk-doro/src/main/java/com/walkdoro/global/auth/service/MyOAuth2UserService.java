@@ -1,7 +1,7 @@
 package com.walkdoro.global.auth.service;
 
 import com.walkdoro.domain.user.User;
-import com.walkdoro.domain.user.UserRepository;
+import com.walkdoro.domain.user.repository.UserRepository;
 import com.walkdoro.global.auth.dto.OAuthAttributes;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

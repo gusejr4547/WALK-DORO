@@ -2,7 +2,7 @@ package com.walkdoro.global.auth.handler;
 
 import com.walkdoro.domain.auth.repository.RefreshTokenRepository;
 import com.walkdoro.domain.user.User;
-import com.walkdoro.domain.user.UserRepository;
+import com.walkdoro.domain.user.repository.UserRepository;
 import com.walkdoro.global.auth.jwt.JwtTokenProvider;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;

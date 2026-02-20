@@ -1,10 +1,9 @@
 package com.walkdoro.domain.randombox.controller;
 
 import com.walkdoro.domain.randombox.service.RandomBoxService;
-import lombok.RequiredArgsConstructor;
 import com.walkdoro.domain.item.Item;
 import com.walkdoro.domain.randombox.dto.RandomBoxDrawRequest;
-import com.walkdoro.domain.randombox.service.RandomBoxService;
+import com.walkdoro.domain.randombox.dto.RandomBoxDrawResponse;
 import com.walkdoro.global.auth.dto.UserAdapter;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -25,13 +24,13 @@ public class RandomBoxController {
     private final RandomBoxService randomBoxService;
 
     @PostMapping("/draw")
-    public ResponseEntity<List<Item>> drawBox(
+    public ResponseEntity<RandomBoxDrawResponse> drawBox(
             @AuthenticationPrincipal UserAdapter userAdapter,
             @Valid @RequestBody RandomBoxDrawRequest request) {
 
         Long userId = userAdapter.getId();
         List<Item> drawnItems = randomBoxService.drawBox(userId, request.getType(), request.getQuantity());
 
-        return ResponseEntity.ok(drawnItems);
+        return ResponseEntity.ok(RandomBoxDrawResponse.from(drawnItems));
     }
 }

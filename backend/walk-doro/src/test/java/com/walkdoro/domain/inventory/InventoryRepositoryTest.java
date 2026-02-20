@@ -1,12 +1,13 @@
 package com.walkdoro.domain.inventory;
 
+import com.walkdoro.domain.inventory.repository.InventoryRepository;
 import com.walkdoro.domain.item.Item;
 import com.walkdoro.domain.item.ItemCategory;
 import com.walkdoro.domain.item.ItemGrade;
-import com.walkdoro.domain.item.ItemRepository;
+import com.walkdoro.domain.item.repository.ItemRepository;
 import com.walkdoro.domain.user.Role;
 import com.walkdoro.domain.user.User;
-import com.walkdoro.domain.user.UserRepository;
+import com.walkdoro.domain.user.repository.UserRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

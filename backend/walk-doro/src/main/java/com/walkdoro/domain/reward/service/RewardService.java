@@ -5,7 +5,7 @@ import com.walkdoro.domain.reward.dto.RewardClaimRequest;
 import com.walkdoro.domain.reward.dto.RewardClaimResponse;
 import com.walkdoro.domain.stat.repository.StatRepository;
 import com.walkdoro.domain.user.User;
-import com.walkdoro.domain.user.UserRepository;
+import com.walkdoro.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

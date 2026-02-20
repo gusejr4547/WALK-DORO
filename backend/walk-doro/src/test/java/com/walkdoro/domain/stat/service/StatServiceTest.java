@@ -5,7 +5,7 @@ import com.walkdoro.domain.stat.dto.StepSyncRequest;
 import com.walkdoro.domain.stat.dto.StepSyncResponse;
 import com.walkdoro.domain.stat.repository.StatRepository;
 import com.walkdoro.domain.user.User;
-import com.walkdoro.domain.user.UserRepository;
+import com.walkdoro.domain.user.repository.UserRepository;
 import java.time.LocalDate;
 import java.util.Optional;
 import org.junit.jupiter.api.DisplayName;
