@@ -14,6 +14,10 @@ public enum ErrorCode {
 
     // User
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "U001", "해당 ID의 사용자를 찾을 수 없습니다."),
+    NOT_ENOUGH_POINTS(HttpStatus.BAD_REQUEST, "U002", "포인트가 부족합니다."),
+
+    // Item
+    ITEM_NOT_FOUND(HttpStatus.NOT_FOUND, "I001", "해당 조건의 아이템을 찾을 수 없습니다."),
 
     // Stat
     STAT_NOT_FOUND(HttpStatus.NOT_FOUND, "S001", "해당 날짜의 통계 데이터를 찾을 수 없습니다."),

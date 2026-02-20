@@ -1,17 +1,21 @@
 package com.walkdoro.domain.randombox.dto;
 
 import com.walkdoro.domain.randombox.type.RandomBoxType;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Getter
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor
 public class RandomBoxDrawRequest {
-    private RandomBoxType randomBoxType;
-    private int quantity = 1;
 
-    public RandomBoxDrawRequest(RandomBoxType randomBoxType, int quantity) {
-        this.randomBoxType = randomBoxType;
-        this.quantity = quantity;
-    }
+    @NotNull(message = "RandomBoxType is required")
+    private RandomBoxType type;
+
+    @Min(value = 1, message = "Quantity must be at least 1")
+    private int quantity;
 }

@@ -2,6 +2,8 @@ package com.walkdoro.domain.user;
 
 import com.walkdoro.domain.user.Role;
 import com.walkdoro.global.entity.BaseTimeEntity;
+import com.walkdoro.global.error.ErrorCode;
+import com.walkdoro.global.error.exception.BusinessException;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -46,13 +48,9 @@ public class User extends BaseTimeEntity {
         this.point += amount;
     }
 
-    public boolean hasEnoughPoint(Long amount) {
-        return this.point >= amount;
-    }
-
     public void deductPoint(Long amount) {
-        if (!hasEnoughPoint(amount)) {
-            throw new IllegalArgumentException("Not enough point");
+        if (this.point < amount) {
+            throw new BusinessException(ErrorCode.NOT_ENOUGH_POINTS);
         }
         this.point -= amount;
     }

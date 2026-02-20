@@ -5,56 +5,47 @@ import com.walkdoro.domain.item.ItemCategory;
 import com.walkdoro.domain.item.ItemGrade;
 import com.walkdoro.domain.item.ItemRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
 import java.util.List;
 
-@Configuration
+@Slf4j
+@Component
 @RequiredArgsConstructor
-public class ItemDataInitializer {
+public class ItemDataInitializer implements CommandLineRunner {
 
     private final ItemRepository itemRepository;
 
-    @Bean
-    public CommandLineRunner initItemData() {
-        return args -> {
-            if (itemRepository.count() == 0) {
-                List<Item> items = List.of(
-                        // FACE
-                        Item.builder().name("Energetic Smile").grade(ItemGrade.COMMON).category(ItemCategory.FACE)
-                                .description("A smile full of energy.").build(),
-                        Item.builder().name("Crying Face").grade(ItemGrade.RARE).category(ItemCategory.FACE)
-                                .description("Tears of joy? Or sadness?").build(),
-                        Item.builder().name("Evil Grin").grade(ItemGrade.EPIC).category(ItemCategory.FACE)
-                                .description("Planning something mischievous.").build(),
+    @Override
+    @Transactional
+    public void run(String... args) {
+        if (itemRepository.count() == 0) {
+            log.info("Initializing item dummy data...");
+            List<Item> dummyItems = Arrays.asList(
+                    // Common
+                    Item.builder().name("Energetic Smile").grade(ItemGrade.COMMON).category(ItemCategory.FACE).build(),
+                    Item.builder().name("Red Ribbon").grade(ItemGrade.COMMON).category(ItemCategory.HEADGEAR).build(),
+                    Item.builder().name("Wooden Stick").grade(ItemGrade.COMMON).category(ItemCategory.PROP).build(),
+                    Item.builder().name("Park").grade(ItemGrade.COMMON).category(ItemCategory.BACKGROUND).build(),
 
-                        // HEADGEAR
-                        Item.builder().name("Red Ribbon").grade(ItemGrade.COMMON).category(ItemCategory.HEADGEAR)
-                                .description("Simple but cute ribbon.").build(),
-                        Item.builder().name("Santa Hat").grade(ItemGrade.RARE).category(ItemCategory.HEADGEAR)
-                                .description("Merry Christmas!").build(),
-                        Item.builder().name("Angel Halo").grade(ItemGrade.EPIC).category(ItemCategory.HEADGEAR)
-                                .description("Divine aura.").build(),
-                        Item.builder().name("Commander Cap").grade(ItemGrade.LEGENDARY).category(ItemCategory.HEADGEAR)
-                                .description("Respect my authority.").build(),
+                    // Rare
+                    Item.builder().name("Crying Face").grade(ItemGrade.RARE).category(ItemCategory.FACE).build(),
+                    Item.builder().name("Santa Hat").grade(ItemGrade.RARE).category(ItemCategory.HEADGEAR).build(),
 
-                        // PROP
-                        Item.builder().name("Wooden Stick").grade(ItemGrade.COMMON).category(ItemCategory.PROP)
-                                .description("Solid oak.").build(),
-                        Item.builder().name("Balloon").grade(ItemGrade.RARE).category(ItemCategory.PROP)
-                                .description("Don't let it pop.").build(),
-                        Item.builder().name("Golden Rifle").grade(ItemGrade.LEGENDARY).category(ItemCategory.PROP)
-                                .description("Shines on the battlefield.").build(),
+                    // Epic
+                    Item.builder().name("Angel Halo").grade(ItemGrade.EPIC).category(ItemCategory.HEADGEAR).build(),
 
-                        // BACKGROUND
-                        Item.builder().name("Park").grade(ItemGrade.COMMON).category(ItemCategory.BACKGROUND)
-                                .description("Peaceful afternoon.").build(),
-                        Item.builder().name("Space Station").grade(ItemGrade.LEGENDARY)
-                                .category(ItemCategory.BACKGROUND).description("Zero gravity zone.").build());
-                itemRepository.saveAll(items);
-            }
-        };
+                    // Legendary
+                    Item.builder().name("Golden Rifle").grade(ItemGrade.LEGENDARY).category(ItemCategory.PROP).build(),
+                    Item.builder().name("Space Station").grade(ItemGrade.LEGENDARY).category(ItemCategory.BACKGROUND)
+                            .build());
+            itemRepository.saveAll(dummyItems);
+            log.info("Successfully initialized {} dummy items.", dummyItems.size());
+        }
     }
 }
