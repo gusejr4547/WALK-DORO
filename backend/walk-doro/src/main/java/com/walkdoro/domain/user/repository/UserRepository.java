@@ -1,5 +1,6 @@
-package com.walkdoro.domain.user;
+package com.walkdoro.domain.user.repository;
 
+import com.walkdoro.domain.user.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;

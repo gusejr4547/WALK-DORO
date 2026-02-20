@@ -1,5 +1,6 @@
-package com.walkdoro.domain.inventory;
+package com.walkdoro.domain.inventory.repository;
 
+import com.walkdoro.domain.inventory.Inventory;
 import com.walkdoro.domain.item.Item;
 import com.walkdoro.domain.user.User;
 import org.springframework.data.jpa.repository.JpaRepository;
