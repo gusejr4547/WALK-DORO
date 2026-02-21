@@ -3,6 +3,7 @@ package com.walkdoro.global.error;
 import com.walkdoro.global.error.exception.BusinessException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -20,6 +21,12 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(MethodArgumentNotValidException.class)
     protected ResponseEntity<ErrorResponse> handleMethodArgumentNotValidException(MethodArgumentNotValidException e) {
         log.error("handleMethodArgumentNotValidException", e);
+        return ErrorResponse.toResponseEntity(ErrorCode.INVALID_INPUT_VALUE);
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    protected ResponseEntity<ErrorResponse> handleHttpMessageNotReadableException(HttpMessageNotReadableException e) {
+        log.error("handleHttpMessageNotReadableException", e);
         return ErrorResponse.toResponseEntity(ErrorCode.INVALID_INPUT_VALUE);
     }
 
