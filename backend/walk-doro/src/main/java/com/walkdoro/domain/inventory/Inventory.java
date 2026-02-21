@@ -11,6 +11,12 @@ import lombok.NoArgsConstructor;
 @Getter
 @NoArgsConstructor
 @Entity
+@Table(
+        uniqueConstraints = @UniqueConstraint(
+                name = "uk_inventory_user_item",
+                columnNames = {"user_id", "item_id"}
+        )
+)
 public class Inventory extends BaseTimeEntity {
 
     @Id

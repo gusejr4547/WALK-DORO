@@ -29,7 +29,7 @@ public class RandomBoxService {
 
     @Transactional
     public List<Item> drawBox(Long userId, RandomBoxType type, int quantity) {
-        User user = userRepository.findById(userId)
+        User user = userRepository.findByIdWithPessimisticLock(userId)
                 .orElseThrow(() -> new BusinessException(ErrorCode.USER_NOT_FOUND));
 
         long totalCost = type.getPrice() * quantity;
