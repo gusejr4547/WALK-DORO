@@ -95,4 +95,18 @@ class RandomBoxControllerTest {
                 .content(requestBody))
                 .andExpect(status().isBadRequest());
     }
+
+    @Test
+    @DisplayName("존재하지 않는 RandomBoxType 요청 시 400 Bad Request와 INVALID_INPUT_VALUE 반환")
+    void drawBox_InvalidBoxType() throws Exception {
+        // given: "BASIX" is an invalid RandomBoxType enum value
+        String requestBody = "{\"type\":\"BASIX\",\"quantity\":1}";
+
+        // when & then
+        mockMvc.perform(post("/api/v1/random-boxes/draw")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestBody))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("C001"));
+    }
 }
