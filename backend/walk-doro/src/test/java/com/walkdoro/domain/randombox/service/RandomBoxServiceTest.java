@@ -52,7 +52,7 @@ class RandomBoxServiceTest {
     @DisplayName("사용자를 찾을 수 없으면 예외를 발생해야 한다")
     void drawBox_UserNotFound() {
         // given
-        given(userRepository.findById(anyLong())).willReturn(Optional.empty());
+        given(userRepository.findByIdWithPessimisticLock(anyLong())).willReturn(Optional.empty());
 
         // then
         assertThatThrownBy(() -> randomBoxService.drawBox(1L, RandomBoxType.BASIC, 1))
@@ -67,7 +67,7 @@ class RandomBoxServiceTest {
         User user = User.builder().name("tester").email("test@net.com").role(Role.USER).build();
         user.addPoint(10L); // enough points
 
-        given(userRepository.findById(anyLong())).willReturn(Optional.of(user));
+        given(userRepository.findByIdWithPessimisticLock(anyLong())).willReturn(Optional.of(user));
         given(randomGenerator.nextDouble()).willReturn(0.1); // COMMON
 
         // return empty list
@@ -86,7 +86,7 @@ class RandomBoxServiceTest {
         User user = User.builder().name("tester").email("test@net.com").role(Role.USER).build();
         user.update("tester"); // assuming 0 points initially
 
-        given(userRepository.findById(anyLong())).willReturn(Optional.of(user));
+        given(userRepository.findByIdWithPessimisticLock(anyLong())).willReturn(Optional.of(user));
 
         // then
         assertThatThrownBy(() -> randomBoxService.drawBox(1L, RandomBoxType.BASIC, 1))
@@ -102,10 +102,12 @@ class RandomBoxServiceTest {
         user.addPoint(10L); // enough points
 
         Item dummyItem = Item.builder().name("Sample Item").grade(ItemGrade.RARE).category(ItemCategory.FACE).build();
-        given(userRepository.findById(anyLong())).willReturn(Optional.of(user));
+        given(userRepository.findByIdWithPessimisticLock(anyLong())).willReturn(Optional.of(user));
         given(randomGenerator.nextDouble()).willReturn(0.1); // 0.1 for PREMIUM -> RARE
         given(itemRepository.findAllByGrade(ItemGrade.RARE)).willReturn(List.of(dummyItem));
-        given(inventoryRepository.findByUserAndItem(user, dummyItem)).willReturn(Optional.empty());
+        given(inventoryRepository.findAllByUserAndItemIn(org.mockito.ArgumentMatchers.eq(user),
+                org.mockito.ArgumentMatchers.any()))
+                .willReturn(List.of());
 
         // when
         randomBoxService.drawBox(1L, RandomBoxType.PREMIUM, 1); // costs 5
@@ -123,10 +125,12 @@ class RandomBoxServiceTest {
 
         Item dummyItem = Item.builder().name("Sample Item").grade(ItemGrade.COMMON).category(ItemCategory.FACE).build();
 
-        given(userRepository.findById(anyLong())).willReturn(Optional.of(user));
+        given(userRepository.findByIdWithPessimisticLock(anyLong())).willReturn(Optional.of(user));
         given(randomGenerator.nextDouble()).willReturn(0.1);
         given(itemRepository.findAllByGrade(ItemGrade.COMMON)).willReturn(List.of(dummyItem));
-        given(inventoryRepository.findByUserAndItem(user, dummyItem)).willReturn(Optional.empty());
+        given(inventoryRepository.findAllByUserAndItemIn(org.mockito.ArgumentMatchers.eq(user),
+                org.mockito.ArgumentMatchers.any()))
+                .willReturn(List.of());
 
         // when
         List<Item> result = randomBoxService.drawBox(1L, RandomBoxType.BASIC, 1);
@@ -134,10 +138,12 @@ class RandomBoxServiceTest {
         // then
         assertThat(result).containsExactly(dummyItem);
 
-        org.mockito.ArgumentCaptor<Inventory> captor = org.mockito.ArgumentCaptor.forClass(Inventory.class);
-        org.mockito.Mockito.verify(inventoryRepository).save(captor.capture());
+        org.mockito.ArgumentCaptor<List<Inventory>> captor = org.mockito.ArgumentCaptor.forClass(List.class);
+        org.mockito.Mockito.verify(inventoryRepository).saveAll(captor.capture());
 
-        Inventory saved = captor.getValue();
+        List<Inventory> savedList = captor.getValue();
+        assertThat(savedList).hasSize(1);
+        Inventory saved = savedList.get(0);
         assertThat(saved.getUser()).isEqualTo(user);
         assertThat(saved.getItem()).isEqualTo(dummyItem);
         assertThat(saved.getQuantity()).isEqualTo(1);
@@ -153,7 +159,7 @@ class RandomBoxServiceTest {
         Item commonItem = Item.builder().name("Common").grade(ItemGrade.COMMON).category(ItemCategory.FACE).build();
         Item rareItem = Item.builder().name("Rare").grade(ItemGrade.RARE).category(ItemCategory.HEADGEAR).build();
 
-        given(userRepository.findById(anyLong())).willReturn(Optional.of(user));
+        given(userRepository.findByIdWithPessimisticLock(anyLong())).willReturn(Optional.of(user));
 
         // 2 BASIC draws: random values 0.1 (COMMON) and 0.9 (EPIC - wait I'll use 0.6
         // for RARE)
@@ -162,9 +168,9 @@ class RandomBoxServiceTest {
         given(itemRepository.findAllByGrade(ItemGrade.COMMON)).willReturn(List.of(commonItem));
         given(itemRepository.findAllByGrade(ItemGrade.RARE)).willReturn(List.of(rareItem));
 
-        given(inventoryRepository.findByUserAndItem(org.mockito.ArgumentMatchers.any(),
+        given(inventoryRepository.findAllByUserAndItemIn(org.mockito.ArgumentMatchers.eq(user),
                 org.mockito.ArgumentMatchers.any()))
-                .willReturn(Optional.empty());
+                .willReturn(List.of());
 
         // when
         List<Item> result = randomBoxService.drawBox(1L, RandomBoxType.BASIC, 2); // 2 draws, 1 pt each
@@ -175,7 +181,10 @@ class RandomBoxServiceTest {
 
         assertThat(user.getPoint()).isEqualTo(48L); // 50 - 2 = 48
 
-        org.mockito.Mockito.verify(inventoryRepository, org.mockito.Mockito.times(2))
-                .save(org.mockito.ArgumentMatchers.any(Inventory.class));
+        org.mockito.ArgumentCaptor<List<Inventory>> captor = org.mockito.ArgumentCaptor.forClass(List.class);
+        org.mockito.Mockito.verify(inventoryRepository).saveAll(captor.capture());
+
+        List<Inventory> savedList = captor.getValue();
+        assertThat(savedList).hasSize(2);
     }
 }

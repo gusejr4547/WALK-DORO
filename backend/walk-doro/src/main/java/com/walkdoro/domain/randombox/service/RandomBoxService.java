@@ -16,7 +16,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
+import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -35,12 +39,15 @@ public class RandomBoxService {
         long totalCost = type.getPrice() * quantity;
         user.deductPoint(totalCost);
 
+        Map<ItemGrade, List<Item>> gradeItemsMap = new EnumMap<>(ItemGrade.class);
+        Map<Item, Integer> drawnItemCounts = new HashMap<>();
         List<Item> drawnItems = new ArrayList<>();
+
         for (int i = 0; i < quantity; i++) {
             double rand = randomGenerator.nextDouble();
             ItemGrade grade = type.getRandomGrade(rand);
 
-            List<Item> items = itemRepository.findAllByGrade(grade);
+            List<Item> items = gradeItemsMap.computeIfAbsent(grade, g -> itemRepository.findAllByGrade(g));
             if (items.isEmpty()) {
                 throw new BusinessException(ErrorCode.ITEM_NOT_FOUND);
             }
@@ -48,12 +55,23 @@ public class RandomBoxService {
             int randomIndex = (int) (randomGenerator.nextDouble() * items.size());
             Item selectedItem = items.get(randomIndex);
             drawnItems.add(selectedItem);
-
-            Inventory inventory = inventoryRepository.findByUserAndItem(user, selectedItem)
-                    .orElseGet(() -> Inventory.builder().user(user).item(selectedItem).quantity(0).build());
-            inventory.addQuantity(1);
-            inventoryRepository.save(inventory);
+            drawnItemCounts.merge(selectedItem, 1, Integer::sum);
         }
+
+        List<Inventory> userInventories = inventoryRepository.findAllByUserAndItemIn(user, drawnItemCounts.keySet());
+        Map<Item, Inventory> inventoryMap = userInventories.stream()
+                .collect(Collectors.toMap(Inventory::getItem, inv -> inv));
+
+        List<Inventory> inventoriesToSave = new ArrayList<>();
+        for (Map.Entry<Item, Integer> entry : drawnItemCounts.entrySet()) {
+            Item item = entry.getKey();
+            int count = entry.getValue();
+            Inventory inventory = inventoryMap.getOrDefault(item,
+                    Inventory.builder().user(user).item(item).quantity(0).build());
+            inventory.addQuantity(count);
+            inventoriesToSave.add(inventory);
+        }
+        inventoryRepository.saveAll(inventoriesToSave);
 
         return drawnItems;
     }
