@@ -1,6 +1,7 @@
 package com.walkdoro.domain.randombox.dto;
 
 import com.walkdoro.domain.randombox.type.RandomBoxType;
+import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
@@ -17,5 +18,6 @@ public class RandomBoxDrawRequest {
     private RandomBoxType type;
 
     @Min(value = 1, message = "Quantity must be at least 1")
+    @Max(value = 10, message = "Quantity must not exceed 10")
     private int quantity;
 }

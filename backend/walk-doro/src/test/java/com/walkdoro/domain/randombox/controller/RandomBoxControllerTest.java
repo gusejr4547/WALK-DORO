@@ -109,4 +109,18 @@ class RandomBoxControllerTest {
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value("C001"));
     }
+
+    @Test
+    @DisplayName("quantity가 10 초과 시 400 Bad Request와 INVALID_INPUT_VALUE 반환")
+    void drawBox_QuantityExceeded() throws Exception {
+        // given
+        String requestBody = "{\"type\":\"BASIC\",\"quantity\":11}";
+
+        // when & then
+        mockMvc.perform(post("/api/v1/random-boxes/draw")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(requestBody))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("C001"));
+    }
 }
