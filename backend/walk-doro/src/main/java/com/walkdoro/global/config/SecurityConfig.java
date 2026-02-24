@@ -48,8 +48,8 @@ public class SecurityConfig {
                                                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                                 .authorizeHttpRequests((authorize) -> authorize
                                                 .requestMatchers(PathRequest.toH2Console()).permitAll()
-                                                .requestMatchers("/api/auth/reissue").permitAll()
-                                                .requestMatchers("/api/auth/logout").permitAll()
+                                                .requestMatchers("/api/v1/auth/reissue").permitAll()
+                                                .requestMatchers("/api/v1/auth/logout").permitAll()
                                                 .anyRequest().authenticated())
                                 .exceptionHandling(exceptionHandling -> exceptionHandling
                                                 .authenticationEntryPoint(jwtAuthenticationEntryPoint)

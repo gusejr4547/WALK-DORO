@@ -45,7 +45,7 @@ class AuthControllerTest {
         given(authService.reissueAccessToken(refreshToken)).willReturn(newAccessToken);
 
         // when & then
-        mockMvc.perform(post("/api/auth/reissue")
+        mockMvc.perform(post("/api/v1/auth/reissue")
                 .cookie(new Cookie("refresh_token", refreshToken)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.accessToken").value(newAccessToken));
@@ -58,7 +58,7 @@ class AuthControllerTest {
         String refreshToken = "refresh_token";
 
         // when & then
-        mockMvc.perform(post("/api/auth/logout")
+        mockMvc.perform(post("/api/v1/auth/logout")
                 .cookie(new Cookie("refresh_token", refreshToken)))
                 .andExpect(status().isOk())
                 .andExpect(cookie().maxAge("refresh_token", 0));

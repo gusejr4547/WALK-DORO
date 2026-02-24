@@ -19,7 +19,7 @@ public class AuthController {
 
     private final AuthService authService;
 
-    @PostMapping("/api/auth/reissue")
+    @PostMapping("/api/v1/auth/reissue")
     public ResponseEntity<?> reissue(@CookieValue(name = "refresh_token", required = false) String refreshToken) {
         try {
             String accessToken = authService.reissueAccessToken(refreshToken);
@@ -29,7 +29,7 @@ public class AuthController {
         }
     }
 
-    @PostMapping("/api/auth/logout")
+    @PostMapping("/api/v1/auth/logout")
     public ResponseEntity<?> logout(@CookieValue(name = "refresh_token", required = false) String refreshToken,
             @RequestHeader(value = "Authorization", required = false) String bearerToken,
             HttpServletResponse response) {
