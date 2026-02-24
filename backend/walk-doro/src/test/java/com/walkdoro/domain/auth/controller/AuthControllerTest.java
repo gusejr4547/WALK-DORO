@@ -32,7 +32,9 @@ class AuthControllerTest {
 
     @BeforeEach
     void setUp() {
-        mockMvc = MockMvcBuilders.standaloneSetup(authController).build();
+        mockMvc = MockMvcBuilders.standaloneSetup(authController)
+                .setControllerAdvice(new com.walkdoro.global.error.GlobalExceptionHandler())
+                .build();
     }
 
     @Test
@@ -52,6 +54,23 @@ class AuthControllerTest {
     }
 
     @Test
+    @DisplayName("유효하지 않은 토큰으로 재발급 요청 시 401 Unauthorized와 ErrorResponse를 반환한다")
+    void reissue_ShouldReturnErrorResponse_WhenTokenIsInvalid() throws Exception {
+        // given
+        String invalidToken = "invalid_refresh";
+
+        given(authService.reissueAccessToken(invalidToken))
+                .willThrow(new com.walkdoro.global.error.exception.BusinessException(
+                        com.walkdoro.global.error.ErrorCode.INVALID_REFRESH_TOKEN));
+
+        // when & then
+        mockMvc.perform(post("/api/v1/auth/reissue")
+                .cookie(new Cookie("refresh_token", invalidToken)))
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.code").value("A002"));
+    }
+
+    @Test
     @DisplayName("로그아웃 시 리프레시 토큰을 삭제하고 쿠키를 만료시킨다")
     void logout_ShouldDeleteTokenAndClearCookie() throws Exception {
         // given
@@ -61,6 +80,7 @@ class AuthControllerTest {
         mockMvc.perform(post("/api/v1/auth/logout")
                 .cookie(new Cookie("refresh_token", refreshToken)))
                 .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("LOGOUT_SUCCESS"))
                 .andExpect(cookie().maxAge("refresh_token", 0));
 
         // verify service logout called

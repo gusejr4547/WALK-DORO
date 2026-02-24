@@ -31,7 +31,8 @@ public enum ErrorCode {
     INVALID_REWARD_STEP_UNIT(HttpStatus.BAD_REQUEST, "R004", "보상 수령 단위가 올바르지 않습니다."),
 
     // Auth
-    UNAUTHORIZED_USER(HttpStatus.UNAUTHORIZED, "A001", "로그인이 필요합니다.");
+    UNAUTHORIZED_USER(HttpStatus.UNAUTHORIZED, "A001", "로그인이 필요합니다."),
+    INVALID_REFRESH_TOKEN(HttpStatus.UNAUTHORIZED, "A002", "유효하지 않은 리프레시 토큰입니다.");
 
     private final HttpStatus status;
     private final String code;
