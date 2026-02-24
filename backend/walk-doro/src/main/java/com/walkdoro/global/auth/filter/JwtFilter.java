@@ -32,9 +32,15 @@ public class JwtFilter extends OncePerRequestFilter {
         // 2. 유효성 검사 후 인증 처리
         if (StringUtils.hasText(token) && jwtTokenProvider.validateToken(token)
                 && jwtTokenProvider.isAccessToken(token)) {
-            Authentication authentication = jwtTokenProvider.getAuthentication(token);
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-            log.debug("Security Context에 '{}' 인증 정보를 저장했습니다", authentication.getName());
+
+            // 블랙리스트 검증 로직 추가
+            if (refreshTokenRepository.hasKeyBlackList(token)) {
+                log.warn("블랙리스트에 등록된 토큰입니다.");
+            } else {
+                Authentication authentication = jwtTokenProvider.getAuthentication(token);
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+                log.debug("Security Context에 '{}' 인증 정보를 저장했습니다", authentication.getName());
+            }
         }
 
         filterChain.doFilter(request, response);

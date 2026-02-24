@@ -112,4 +112,29 @@ class JwtFilterTest {
         assertThat(SecurityContextHolder.getContext().getAuthentication()).isNull();
         verify(filterChain).doFilter(request, response);
     }
+
+    @Test
+    @DisplayName("doFilterInternal - 블랙리스트에 등록된 토큰일 때 인증을 설정하지 않아야 한다")
+    void doFilterInternal_ShouldNotSetAuthentication_WhenTokenIsBlacklisted() throws ServletException, IOException {
+        // given
+        String blacklistedToken = "blacklistedToken";
+        MockHttpServletRequest request = new MockHttpServletRequest();
+        request.addHeader("Authorization", "Bearer " + blacklistedToken);
+        MockHttpServletResponse response = new MockHttpServletResponse();
+
+        given(jwtTokenProvider.validateToken(blacklistedToken)).willReturn(true);
+        given(jwtTokenProvider.isAccessToken(blacklistedToken)).willReturn(true);
+        given(refreshTokenRepository.hasKeyBlackList(blacklistedToken)).willReturn(true);
+
+        // when
+        jwtFilter.doFilterInternal(request, response, filterChain);
+
+        // then
+        verify(jwtTokenProvider).validateToken(blacklistedToken);
+        verify(jwtTokenProvider).isAccessToken(blacklistedToken);
+        verify(refreshTokenRepository).hasKeyBlackList(blacklistedToken);
+        verify(jwtTokenProvider, never()).getAuthentication(any());
+        assertThat(SecurityContextHolder.getContext().getAuthentication()).isNull();
+        verify(filterChain).doFilter(request, response);
+    }
 }
