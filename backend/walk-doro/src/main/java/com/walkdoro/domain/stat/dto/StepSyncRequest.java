@@ -1,6 +1,7 @@
 package com.walkdoro.domain.stat.dto;
 
 import java.time.LocalDate;
+
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PastOrPresent;
 import jakarta.validation.constraints.PositiveOrZero;
