@@ -9,6 +9,7 @@ import com.walkdoro.domain.user.repository.UserRepository;
 import com.walkdoro.global.auth.resolver.LoginUserArgumentResolver;
 import com.walkdoro.global.auth.dto.UserAdapter;
 import com.walkdoro.global.error.GlobalExceptionHandler;
+import com.walkdoro.global.idempotency.IdempotencyService;
 import java.time.LocalDate;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
@@ -19,6 +20,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
@@ -48,7 +50,7 @@ class RewardControllerConcurrencyTest {
 
     @BeforeEach
     void setUp() {
-        mockMvc = MockMvcBuilders.standaloneSetup(new RewardController(rewardService))
+        mockMvc = MockMvcBuilders.standaloneSetup(new RewardController(rewardService, Mockito.mock(IdempotencyService.class)))
                 .setControllerAdvice(new GlobalExceptionHandler())
                 .setCustomArgumentResolvers(new LoginUserArgumentResolver())
                 .build();
